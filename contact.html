@@ -112,6 +112,11 @@
 						submitButton.textContent = "Submit";
 						submitButton.disabled = false;
 					});
+				
+					setTimeout(() => {
+						responseOutput.innerHTML = ""; // Clear success message after 5 seconds
+					}, 3000);
+
 			});
 
 			function showError(inputElement, message) {
