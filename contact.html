@@ -1,93 +1,247 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="utf-8">
-<title>Kesh Tec Inc   | Contact</title>
-<!-- Stylesheets -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/style.css?1=1" rel="stylesheet">
-<link href="css/responsive.css" rel="stylesheet">
+	<meta charset="utf-8">
+	<title>Kesh Tec Inc | Contact</title>
+	<!-- Stylesheets -->
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<link href="css/style.css?1=1" rel="stylesheet">
+	<link href="css/responsive.css" rel="stylesheet">
 
-<link rel="shortcut icon" href="images/background/Favison.png" type="image/x-icon">
-<link rel="icon" href="images/favicon.ico?1=1" type="image/x-icon">
+	<link rel="shortcut icon" href="images/background/Favison.png" type="image/x-icon">
+	<link rel="icon" href="images/favicon.ico?1=1" type="image/x-icon">
 
-<!-- Responsive -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<!-- Responsive -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
-<!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
-<!--[if lt IE 9]><script src="js/respond.js"></script><![endif]-->
+	<!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
+	<!--[if lt IE 9]><script src="js/respond.js"></script><![endif]-->
 
 
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-58XBD8Q');</script>
-<!-- End Google Tag Manager -->
+	<!-- Google Tag Manager -->
+	<script>(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-58XBD8Q');</script>
+	<!-- End Google Tag Manager -->
 
- 
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6L6SLC5BTN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-6L6SLC5BTN');
-</script>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-6L6SLC5BTN"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'G-6L6SLC5BTN');
+	</script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const form = document.getElementById("contact-form");
+			const submitButton = form.querySelector(".theme-btn");
+
+			form.addEventListener("submit", function (event) {
+				event.preventDefault(); // Prevent default form submission
+
+				let isValid = true;
+				const nameInput = form.querySelector("input[name='firstname']");
+				const emailInput = form.querySelector("input[name='email']");
+				const messageInput = form.querySelector("textarea[name='message']");
+				const responseOutput = document.createElement("div"); // Create success message container
+
+				// Remove previous error messages
+				document.querySelectorAll(".error-message").forEach(el => el.remove());
+				responseOutput.innerHTML = ""; // Clear previous success message
+
+				// Validate Name
+				if (nameInput.value.trim() === "") {
+					isValid = false;
+					showError(nameInput, "Full name is required.");
+				}
+
+				// Validate Email
+				if (emailInput.value.trim() === "") {
+					isValid = false;
+					showError(emailInput, "Email is required.");
+				} else if (!validateEmail(emailInput.value)) {
+					isValid = false;
+					showError(emailInput, "Invalid email format.");
+				}
+
+				if (!isValid) return; // Stop execution if validation fails
+
+				// Show loading effect
+				submitButton.textContent = "Submitting...";
+				submitButton.disabled = true;
+
+				// Create form data object
+				let formData = new FormData(form);
+
+				// Send data to mail.php using AJAX
+				fetch("mail.php", {
+					method: "POST",
+					body: formData
+				})
+					.then(response => response.text())
+					.then(data => {
+						// Simulating success message
+						responseOutput.innerHTML = "<p style='color: green; font-size: 16px;'>Your message has been sent successfully!</p>";
+						form.appendChild(responseOutput);
+
+						// Reset form fields
+						form.reset();
+
+						// Restore button state
+						submitButton.textContent = "Submit";
+						submitButton.disabled = false;
+					})
+					.catch(error => {
+						// Handle errors
+						responseOutput.innerHTML = "<p style='color: red; font-size: 16px;'>Error sending message. Please try again.</p>";
+						form.appendChild(responseOutput);
+
+						// Restore button state
+						submitButton.textContent = "Submit";
+						submitButton.disabled = false;
+					});
+			});
+
+			function showError(inputElement, message) {
+				const errorElement = document.createElement("div");
+				errorElement.className = "error-message";
+				errorElement.style.color = "red";
+				errorElement.style.fontSize = "14px";
+				errorElement.style.marginTop = "5px";
+				errorElement.textContent = message;
+				inputElement.parentNode.appendChild(errorElement);
+			}
+
+			function validateEmail(email) {
+				const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				return emailPattern.test(email);
+			}
+		});
+	</script>
+
+
 </head>
 
 <body>
 
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-58XBD8Q"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-58XBD8Q" height="0" width="0"
+			style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
 
 
-<div class="page-wrapper">
- 	
-    <!-- Preloader 
+	<div class="page-wrapper">
+
+		<!-- Preloader 
     <div class="preloader"></div> -->
- 	
-    <!-- Main Header-->
-    <header class="main-header header-style-five five-alternate">
-    	
-		<!--Header Top-->
-        <div class="header-top">
-            <div class="auto-container">
-                <div class="inner-container clearfix">
-                    <div class="top-left">
-                       <ul class="contact-list clearfix">
-                            <li><i class="fa fa-envelope-o"></i> <a href="mailto:hr@keshtecinc.com" > hr@keshtecinc.com</a></li>
-                          <li><i class=" fa fa-phone"></i><a href="tel:630-570-0549" style="color:#afd3f3">630-570-0549</a>  </li>
-							<li><i class="fa fa-map-marker"></i><a href="https://www.google.com/maps/place/Kesh+Tec+Inc/@33.2081816,-96.6446299,14.25z/data=!3m1!5s0x864e82c595673879:0x7646c55f958f1acd!4m6!3m5!1s0x864e832359aa8d1d:0xb765853205cba424!8m2!3d33.2132989!4d-96.6353691!16s%2Fg%2F11sx2w_s0d?authuser=0&entry=ttu" target="_blank">Kesh Tec Inc.</a></li>
-                        </ul>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-        <!-- End Header Top -->
-		
-    	<!--Header-Upper-->
-        <div class="header-upper">
-        	<div class="auto-container">
-            	<div class="clearfix">
-                	
-                	<div class="pull-left ">
-                    	<div class="logo-boxser"><a href="index.html"><img src="images/logo33.svg" alt="" title=""></a></div>
-                    </div>
-                   	
-                   	<div class="nav-outer clearfix">
-                    
+
+		<!-- Main Header-->
+		<header class="main-header header-style-five five-alternate">
+
+			<!--Header Top-->
+			<div class="header-top">
+				<div class="auto-container">
+					<div class="inner-container clearfix">
+						<div class="top-left">
+							<ul class="contact-list clearfix">
+								<li><i class="fa fa-envelope-o"></i> <a href="mailto:hr@keshtecinc.com">
+										hr@keshtecinc.com</a></li>
+								<li><i class=" fa fa-phone"></i><a href="tel:630-570-0549"
+										style="color:#afd3f3">630-570-0549</a> </li>
+								<li><i class="fa fa-map-marker"></i><a
+										href="https://www.google.com/maps/place/Kesh+Tec+Inc/@33.2081816,-96.6446299,14.25z/data=!3m1!5s0x864e82c595673879:0x7646c55f958f1acd!4m6!3m5!1s0x864e832359aa8d1d:0xb765853205cba424!8m2!3d33.2132989!4d-96.6353691!16s%2Fg%2F11sx2w_s0d?authuser=0&entry=ttu"
+										target="_blank">Kesh Tec Inc.</a></li>
+							</ul>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!-- End Header Top -->
+
+			<!--Header-Upper-->
+			<div class="header-upper">
+				<div class="auto-container">
+					<div class="clearfix">
+
+						<div class="pull-left ">
+							<div class="logo-boxser"><a href="index.html"><img src="images/logo33.svg" alt=""
+										title=""></a></div>
+						</div>
+
+						<div class="nav-outer clearfix">
+
+							<!-- Main Menu -->
+							<nav class="main-menu navbar-expand-md">
+								<div class="navbar-header">
+									<button class="navbar-toggler" type="button" data-toggle="collapse"
+										data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+										aria-expanded="false" aria-label="Toggle navigation">
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+									</button>
+								</div>
+
+								<div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
+									<ul class="navigation clearfix">
+										<li><a href="index.html">Home</a></li>
+										<li class="dropdown"><a href="#">Services</a>
+											<ul>
+												<li><a href="custom_software_solutions.html">Custom Software
+														Solutions</a></li>
+												<li><a href="it_staffing.html">IT Staffing & Services</a></li>
+												<li><a href="managed_it.html">Managed IT Services</a></li>
+
+											</ul>
+										</li>
+										<li><a href="about.html">About us</a></li>
+										<li><a href="jobposting.html">Jobs</a></li>
+										<li><a href="careers.html">Careers</a></li>
+										<li class="current"><a href="contact.html">Contact us</a></li>
+
+									</ul>
+								</div>
+
+							</nav>
+
+
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!--End Header Upper-->
+
+			<!--Sticky Header-->
+			<div class="sticky-header">
+				<div class="auto-container clearfix">
+					<!--Logo-->
+					<div class="logo pull-left">
+						<a href="index.html" class="img-responsive"><img src="images/logo33.svg" alt="" title=""></a>
+					</div>
+
+					<!--Right Col-->
+					<div class="right-col pull-right">
 						<!-- Main Menu -->
 						<nav class="main-menu navbar-expand-md">
 							<div class="navbar-header">
-								<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+								<button class="navbar-toggler" type="button" data-toggle="collapse"
+									data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+									aria-expanded="false" aria-label="Toggle navigation">
 									<span class="icon-bar"></span>
 									<span class="icon-bar"></span>
 									<span class="icon-bar"></span>
@@ -96,161 +250,119 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 							<div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
 								<ul class="navigation clearfix">
-									 <li><a href="index.html">Home</a></li>
-								<li class="dropdown"><a href="#">Services</a>
-									<ul>
-										<li><a href="custom_software_solutions.html">Custom Software Solutions</a></li>
-										<li><a href="it_staffing.html">IT Staffing & Services</a></li>
-										<li><a href="managed_it.html">Managed IT Services</a></li>
-									
-									</ul>
-								</li>
+									<li><a href="index.html">Home</a></li>
+									<li class="dropdown"><a href="#">Services</a>
+										<ul>
+											<li><a href="custom_software_solutions.html">Custom Software Solutions</a>
+											</li>
+											<li><a href="it_staffing.html">IT Staffing & Services</a></li>
+											<li><a href="managed_it.html">Managed IT Services</a></li>
+
+										</ul>
+									</li>
 									<li><a href="about.html">About us</a></li>
 									<li><a href="jobposting.html">Jobs</a></li>
 									<li><a href="careers.html">Careers</a></li>
-									<li  class="current" ><a href="contact.html">Contact us</a></li>
-									
+									<li class="current"><a href="contact.html">Contact us</a></li>
+
 								</ul>
-							</div>
-							
-						</nav>
-						
-					
-						
-					</div>
-					
-                </div>
-            </div>
-        </div>
-        <!--End Header Upper-->
-        
-		<!--Sticky Header-->
-        <div class="sticky-header">
-        	<div class="auto-container clearfix">
-            	<!--Logo-->
-            	<div class="logo pull-left">
-                	<a href="index.html" class="img-responsive"><img src="images/logo33.svg" alt="" title=""></a>
-                </div>
-                
-                <!--Right Col-->
-                <div class="right-col pull-right">
-                	<!-- Main Menu -->
-                  	<nav class="main-menu navbar-expand-md">
-							<div class="navbar-header">
-								<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-									<span class="icon-bar"></span>
-									<span class="icon-bar"></span>
-									<span class="icon-bar"></span>
-								</button>
 							</div>
 
-							<div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
-								<ul class="navigation clearfix">
-									 <li><a href="index.html">Home</a></li>
-								<li class="dropdown"><a href="#">Services</a>
-									<ul>
-										<li><a href="custom_software_solutions.html">Custom Software Solutions</a></li>
-										<li><a href="it_staffing.html">IT Staffing & Services</a></li>
-										<li><a href="managed_it.html">Managed IT Services</a></li>
-									
-									</ul>
-								</li>
-									<li><a href="about.html">About us</a></li>
-									<li><a href="jobposting.html">Jobs</a></li>
-									<li><a href="careers.html">Careers</a></li>
-									<li  class="current"><a href="contact.html">Contact us</a></li>
-									
-								</ul>
-							</div>
-							
 						</nav>
-					<!-- Main Menu End-->
-                </div>
-                
-            </div>
-        </div>
-        <!--End Sticky Header-->
-		
-    </header>
-    <!--End Main Header -->
-	
-	<!--Page Title-->
-    <section class="page-title" style="background-image:url(images/background/contact.jpg)">
-    	<div class="auto-container">
-			<div class="content">
-				<h1>Contact <span>us</span></h1>
-				<ul class="page-breadcrumb">
-					<li><a href="index.html">Home</a></li>
-					<li>contact</li>
-				</ul>
-			</div>
-        </div>
-    </section>
-    <!--End Page Title-->
-	
-	<!-- Contact Page Section -->
-	<section class="contact-page-section">
-		
-		<div class="auto-container">
-			<div class="inner-container">
-				<h2>Reach Us for Staffing and <br><span>Recruiting Services</span></h2>
-				<div class="row clearfix">
-					
-					<!-- Info Column -->
-					<div class="info-column col-lg-7 col-md-12 col-sm-12">
-						<div class="inner-column">
-							<div class="text">Are you interested in our IT services or need any professional advice? Then, get in touch and we'll love to help. We are trusted by the top companies. Let’s ideate together about your New Project.</div>
-							<div class="text">We aim to give imaginative IT solutions for your business needs. Reach us to perceive how our solutions can help your business. Contact Us to schedule a consultation.</div>
-							<div class="text">Fill the details and submit your query with us we provide you with the best help and support. Let's get started today.</div>
-							<ul class="list-style-five">
-								<li><span class="icon fa fa-building"></span> Kesh Tec Inc<br/>
-1575 Redbud Blvd, Suite # 100, McKinney, TX 75069</li>
-								<li><span class="icon fa fa-phone"></span><a href="tel:630-570-0549">630-570-0549</a>  </li>
-								<li><span class="icon fa fa-envelope-o"></span>
-							<a href="mailto:hr@keshtecinc.com"> hr@keshtecinc.com</a>
-								</li>
-							</ul>
-						</div>
+						<!-- Main Menu End-->
 					</div>
-					
-					<!-- Form Column -->
-					<div class="form-column col-lg-5 col-md-12 col-sm-12">
-						<div class="inner-column">
-							
-							<!--Contact Form-->
-							<div class="contact-form">
-								<form method="post" action="mail.php" id="contact-form">
-									
-									<div class="form-group">
-										<input type="text" name="firstname" value="" placeholder="Full name" required>
-									</div>
-									
-									<div class="form-group">
-										<input type="text" name="email" value="" placeholder="Email" required>
-									</div>
-																		 									
-									<div class="form-group">
-										<textarea name="message" placeholder="write.."></textarea>
-									</div>
-									
-									<div class="form-group">
-										<button type="submit" class="theme-btn">Submit</button>
-									</div>                                        
-									
-								</form>
-							</div>
-							
-						</div>
-					</div>
-					
+
 				</div>
 			</div>
-		</div>
-		<div class="map-section">
-			<!--Map Outer-->
-			<div class="map-outer">
-				<!--Map Canvas-->
-			<!--	<div class="map-canvas"
+			<!--End Sticky Header-->
+
+		</header>
+		<!--End Main Header -->
+
+		<!--Page Title-->
+		<section class="page-title" style="background-image:url(images/background/contact.jpg)">
+			<div class="auto-container">
+				<div class="content">
+					<h1>Contact <span>us</span></h1>
+					<ul class="page-breadcrumb">
+						<li><a href="index.html">Home</a></li>
+						<li>contact</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+		<!--End Page Title-->
+
+		<!-- Contact Page Section -->
+		<section class="contact-page-section">
+
+			<div class="auto-container">
+				<div class="inner-container">
+					<h2>Reach Us for Staffing and <br><span>Recruiting Services</span></h2>
+					<div class="row clearfix">
+
+						<!-- Info Column -->
+						<div class="info-column col-lg-7 col-md-12 col-sm-12">
+							<div class="inner-column">
+								<div class="text">Are you interested in our IT services or need any professional advice?
+									Then, get in touch and we'll love to help. We are trusted by the top companies.
+									Let’s ideate together about your New Project.</div>
+								<div class="text">We aim to give imaginative IT solutions for your business needs. Reach
+									us to perceive how our solutions can help your business. Contact Us to schedule a
+									consultation.</div>
+								<div class="text">Fill the details and submit your query with us we provide you with the
+									best help and support. Let's get started today.</div>
+								<ul class="list-style-five">
+									<li><span class="icon fa fa-building"></span> Kesh Tec Inc<br />
+										1575 Redbud Blvd, Suite # 100, McKinney, TX 75069</li>
+									<li><span class="icon fa fa-phone"></span><a
+											href="tel:630-570-0549">630-570-0549</a> </li>
+									<li><span class="icon fa fa-envelope-o"></span>
+										<a href="mailto:hr@keshtecinc.com"> hr@keshtecinc.com</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+
+						<!-- Form Column -->
+						<div class="form-column col-lg-5 col-md-12 col-sm-12">
+							<div class="inner-column">
+
+								<!--Contact Form-->
+								<div class="contact-form">
+									<form method="post" action="mail.php" id="contact-form">
+
+										<div class="form-group">
+											<input type="text" name="firstname" value="" placeholder="Full name"
+												required>
+										</div>
+
+										<div class="form-group">
+											<input type="text" name="email" value="" placeholder="Email" required>
+										</div>
+
+										<div class="form-group">
+											<textarea name="message" placeholder="write.."></textarea>
+										</div>
+
+										<div class="form-group">
+											<button type="submit" class="theme-btn">Submit</button>
+										</div>
+
+									</form>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="map-section">
+				<!--Map Outer-->
+				<div class="map-outer">
+					<!--Map Canvas-->
+					<!--	<div class="map-canvas"
 					data-zoom="12"
 					data-lat="-37.817085"
 					data-lng="144.955631"
@@ -260,142 +372,156 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					data-icon-path="images/icons/map-marker.png"
 					data-content="Melbourne VIC 3000, Australia<br><a href='mailto:info@youremail.com'>info@youremail.com</a>">
 				</div> -->
-				<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d22456.81545577546!2d-96.64462991015411!3d33.20818161663091!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864e832359aa8d1d%3A0xb765853205cba424!2sKesh%20Tec%20Inc!5e0!3m2!1sen!2sin!4v1702671182913!5m2!1sen!2sin" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-				
-			</div>
-		</div>
-	</section>
-	<!-- End Team Page Section -->
-	
-	
-	
-	<!--Main Footer-->
- <footer class="main-footer">
-    	<div class="auto-container">
-        	<!--Widgets Section-->
-            <div class="widgets-section">
-            	<div class="row clearfix">
-                	
-                    <!--Column-->
-                    <div class="big-column col-lg-6 col-md-12 col-sm-12">
-						<div class="row clearfix">
-						
-                        	<!--Footer Column-->
-                            <div class="footer-column col-lg-7 col-md-6 col-sm-12">
-                                <div class="footer-widget logo-widget">
-									<div class="logo-box footerlogo">
-										<a href="index.html"><img src="images/logowithtagline.svg" alt="" /></a>
-									</div>
-									<div class="text">Kesh Tec Inc   enables you to achieve your business goals by scaling up operations, reducing risk, and getting a consistent level of success.</div>
-									
-								</div>
-							</div>
-							
-							<!--Footer Column-->
-                            <div class="footer-column col-lg-5 col-md-6 col-sm-12">
-                                <div class="footer-widget links-widget">
-									<h4>Links</h4>
-									<ul class="list-link">
-										<li><a href="index.html">Home</a></li>
-										<li><a href="custom_software_solutions.html">Services</a></li>
-										<li><a href="about.html">About us</a></li>
-										<li><a href="jobposting.html">Jobs</a></li>
-										<li><a href="careers.html">Careers</a></li>
-										<li><a href="contact.html">Contact us</a></li>
-									</ul>
-								</div>
-							</div>
+					<iframe
+						src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d22456.81545577546!2d-96.64462991015411!3d33.20818161663091!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864e832359aa8d1d%3A0xb765853205cba424!2sKesh%20Tec%20Inc!5e0!3m2!1sen!2sin!4v1702671182913!5m2!1sen!2sin"
+						width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+						referrerpolicy="no-referrer-when-downgrade"></iframe>
 
-						</div>
-					</div>
-					
-					<!--Column-->
-                    <div class="big-column col-lg-6 col-md-12 col-sm-12">
-						<div class="row clearfix">
-						
-                        	<!--Footer Column-->
-                            <div class="footer-column col-lg-6 col-md-6 col-sm-12">
-                                <div class="footer-widget links-widget">
-									<h4>Our Services</h4>
-									<ul class="list-link">
-										<li><a href="custom_software_solutions.html">Custom Software Solutions</a></li>
-										<li><a href="it_staffing.html">IT Staffing & Services</a></li>
-										<li><a href="managed_it.html">Managed IT Services</a></li>
-										
-									</ul>
+				</div>
+			</div>
+		</section>
+		<!-- End Team Page Section -->
+
+
+
+		<!--Main Footer-->
+		<footer class="main-footer">
+			<div class="auto-container">
+				<!--Widgets Section-->
+				<div class="widgets-section">
+					<div class="row clearfix">
+
+						<!--Column-->
+						<div class="big-column col-lg-6 col-md-12 col-sm-12">
+							<div class="row clearfix">
+
+								<!--Footer Column-->
+								<div class="footer-column col-lg-7 col-md-6 col-sm-12">
+									<div class="footer-widget logo-widget">
+										<div class="logo-box footerlogo">
+											<a href="index.html"><img src="images/logowithtagline.svg" alt="" /></a>
+										</div>
+										<div class="text">Kesh Tec Inc enables you to achieve your business goals by
+											scaling up operations, reducing risk, and getting a consistent level of
+											success.</div>
+
+									</div>
 								</div>
+
+								<!--Footer Column-->
+								<div class="footer-column col-lg-5 col-md-6 col-sm-12">
+									<div class="footer-widget links-widget">
+										<h4>Links</h4>
+										<ul class="list-link">
+											<li><a href="index.html">Home</a></li>
+											<li><a href="custom_software_solutions.html">Services</a></li>
+											<li><a href="about.html">About us</a></li>
+											<li><a href="jobposting.html">Jobs</a></li>
+											<li><a href="careers.html">Careers</a></li>
+											<li><a href="contact.html">Contact us</a></li>
+										</ul>
+									</div>
+								</div>
+
 							</div>
-							
-							<!--Footer Column-->
-                            <div class="footer-column col-lg-6 col-md-6 col-sm-12">
-                                <div class="footer-widget gallery-widget">
-									<h4>Contact Info</h4>
-									<div class="widget-content">
-										<div class="images-outer clearfix">
-				<ul class="list-style-two">
-									<li><span class="icon fa fa-phone"></span><a href="tel:630-570-0549" style="color:#afd3f3">630-570-0549</a>  </li>
-										<li><span class="icon fa fa-envelope"></span>
-<a href="mailto:hr@keshtecinc.com" style="color:#afd3f3"> hr@keshtecinc.com</a>
-									</li>
-										<li><span class="icon fa fa-home"></span>Kesh Tec Inc 
-										<br/>1575 Redbud Blvd, Suite # 100, McKinney, TX 75069</li>
-									</ul>
+						</div>
+
+						<!--Column-->
+						<div class="big-column col-lg-6 col-md-12 col-sm-12">
+							<div class="row clearfix">
+
+								<!--Footer Column-->
+								<div class="footer-column col-lg-6 col-md-6 col-sm-12">
+									<div class="footer-widget links-widget">
+										<h4>Our Services</h4>
+										<ul class="list-link">
+											<li><a href="custom_software_solutions.html">Custom Software Solutions</a>
+											</li>
+											<li><a href="it_staffing.html">IT Staffing & Services</a></li>
+											<li><a href="managed_it.html">Managed IT Services</a></li>
+
+										</ul>
+									</div>
+								</div>
+
+								<!--Footer Column-->
+								<div class="footer-column col-lg-6 col-md-6 col-sm-12">
+									<div class="footer-widget gallery-widget">
+										<h4>Contact Info</h4>
+										<div class="widget-content">
+											<div class="images-outer clearfix">
+												<ul class="list-style-two">
+													<li><span class="icon fa fa-phone"></span><a href="tel:630-570-0549"
+															style="color:#afd3f3">630-570-0549</a> </li>
+													<li><span class="icon fa fa-envelope"></span>
+														<a href="mailto:hr@keshtecinc.com" style="color:#afd3f3">
+															hr@keshtecinc.com</a>
+													</li>
+													<li><span class="icon fa fa-home"></span>Kesh Tec Inc
+														<br />1575 Redbud Blvd, Suite # 100, McKinney, TX 75069
+													</li>
+												</ul>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							
-						</div>
-					</div>
-					
-				</div>
-			</div>
-		</div>
-		<!-- Footer Bottom -->
-		<div class="footer-bottom">
-			<div class="auto-container">
-				<div class="row clearfix">
-					
-					<!-- Copyright Column -->
-					<div class="copyright-column col-lg-6 col-md-6 col-sm-12">
-						<div class="copyright">Copyright ©2022 Kesh Tec Inc. All rights reserved.</div>
-					</div>
-					
-					<!-- Social Column -->
-					<div class="social-column col-lg-6 col-md-6 col-sm-12">
-						<ul>
-							<li class="follow">Follow us: </li>
-							<li><a href="https://www.facebook.com" target="_blank"><i class="fa fa-facebook"></i></a></li>
-							<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-							<li><a href="https://www.linkedin.com/" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-							<li><a href="https://www.instagram.com/" target="_blank"><i class="fa fa-instagram"></i></a></li>
-							<li><a href="https://www.indeed.com/" target="_blank"><i class="fa fa-indeed">id</i></a></li>
-						</ul>
-					</div>
-					
-				</div>
-			</div>
-		</div>
-	</footer>
-	
-</div>
-<!--End pagewrapper-->
 
-<script src="js/jquery.js"></script>
-<script src="js/popper.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
-<script src="js/jquery.fancybox.js"></script>
-<script src="js/appear.js"></script>
-<script src="js/owl.js"></script>
-<script src="js/wow.js"></script>
-<script src="js/validate.js"></script>
-<script src="js/jquery-ui.js"></script>
-<script src="js/main.js"></script>
-<!--Google Map APi Key-->
-<script src="http://maps.google.com/maps/api/js?key=AIzaSyDTPlX-43R1TpcQUyWjFgiSfL_BiGxslZU"></script>
-<script src="js/map-script.js"></script>
-<!--End Google Map APi-->
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!-- Footer Bottom -->
+			<div class="footer-bottom">
+				<div class="auto-container">
+					<div class="row clearfix">
+
+						<!-- Copyright Column -->
+						<div class="copyright-column col-lg-6 col-md-6 col-sm-12">
+							<div class="copyright">Copyright ©2022 Kesh Tec Inc. All rights reserved.</div>
+						</div>
+
+						<!-- Social Column -->
+						<div class="social-column col-lg-6 col-md-6 col-sm-12">
+							<ul>
+								<li class="follow">Follow us: </li>
+								<li><a href="https://www.facebook.com" target="_blank"><i
+											class="fa fa-facebook"></i></a></li>
+								<li><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li><a href="https://www.linkedin.com/" target="_blank"><i
+											class="fa fa-linkedin"></i></a></li>
+								<li><a href="https://www.instagram.com/" target="_blank"><i
+											class="fa fa-instagram"></i></a></li>
+								<li><a href="https://www.indeed.com/" target="_blank"><i class="fa fa-indeed">id</i></a>
+								</li>
+							</ul>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</footer>
+
+	</div>
+	<!--End pagewrapper-->
+
+	<script src="js/jquery.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script src="js/jquery.fancybox.js"></script>
+	<script src="js/appear.js"></script>
+	<script src="js/owl.js"></script>
+	<script src="js/wow.js"></script>
+	<script src="js/validate.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/main.js"></script>
+	<!--Google Map APi Key-->
+	<script src="http://maps.google.com/maps/api/js?key=AIzaSyDTPlX-43R1TpcQUyWjFgiSfL_BiGxslZU"></script>
+	<script src="js/map-script.js"></script>
+	<!--End Google Map APi-->
 
 </body>
+
 </html>
